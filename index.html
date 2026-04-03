@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aegis Gulf — POPIA Compliance Infrastructure</title>
+<meta name="description" content="High-performance C++ compliance infrastructure for South African enterprises. AES-256-GCM encryption. SHA-256 audit chains. POPIA Section 19 compliant.">
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --teal: #1B7A6E;
+    --teal-light: #E8F4F2;
+    --silver: #8A9BB0;
+    --dark: #1A2332;
+    --sa-green: #007A4D;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         color: var(--dark); background: #fff; }
+
+  /* NAV */
+  nav {
+    background: var(--navy); padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px; position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { color: #fff; font-weight: 700; font-size: 1.1rem; letter-spacing: .5px; }
+  .nav-brand span { color: var(--teal); }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a { color: var(--silver); text-decoration: none; font-size: .9rem;
+                 transition: color .2s; }
+  .nav-links a:hover { color: #fff; }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    background-image: linear-gradient(135deg, #0D1B2A 0%, #0F2A20 100%);
+    padding: 5rem 2rem 4rem; text-align: center;
+  }
+  .hero-badge {
+    display: inline-block; background: var(--sa-green); color: #fff;
+    font-size: .75rem; font-weight: 600; letter-spacing: .08em;
+    padding: .3rem 1rem; border-radius: 20px; margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+  .hero h1 { color: #fff; font-size: 2.8rem; font-weight: 700;
+              line-height: 1.15; margin-bottom: 1rem; }
+  .hero h1 span { color: var(--teal); }
+  .hero p { color: var(--silver); font-size: 1.1rem; max-width: 600px;
+             margin: 0 auto 2rem; line-height: 1.7; }
+  .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--teal); color: #fff; padding: .75rem 1.8rem;
+    border-radius: 6px; text-decoration: none; font-weight: 600;
+    font-size: .95rem; transition: opacity .2s;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-secondary {
+    background: transparent; color: #fff; padding: .75rem 1.8rem;
+    border-radius: 6px; text-decoration: none; font-weight: 600;
+    font-size: .95rem; border: 1.5px solid var(--silver);
+    transition: border-color .2s;
+  }
+  .btn-secondary:hover { border-color: #fff; }
+
+  /* METRICS */
+  .metrics {
+    background: #0A1520; padding: 2rem;
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 0;
+  }
+  .metric {
+    padding: 1.2rem 2.5rem; text-align: center;
+    border-right: 1px solid #1a2d3f;
+  }
+  .metric:last-child { border-right: none; }
+  .metric-num { font-size: 1.8rem; font-weight: 700; color: #fff; }
+  .metric-label { font-size: .8rem; color: var(--silver); margin-top: .3rem; }
+
+  /* SECTIONS */
+  section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-label { font-size: .8rem; font-weight: 600; letter-spacing: .1em;
+                   text-transform: uppercase; color: var(--teal); margin-bottom: .75rem; }
+  h2 { font-size: 2rem; font-weight: 700; color: var(--navy);
+       margin-bottom: 1rem; line-height: 1.2; }
+  .lead { font-size: 1.05rem; color: #555; line-height: 1.7;
+          max-width: 650px; margin-bottom: 2.5rem; }
+
+  /* CARDS */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem; }
+  .card {
+    border: 1px solid #E5EAF0; border-radius: 10px;
+    padding: 1.5rem; transition: border-color .2s;
+  }
+  .card:hover { border-color: var(--teal); }
+  .card-icon {
+    width: 42px; height: 42px; border-radius: 8px;
+    background: var(--teal-light); display: flex; align-items: center;
+    justify-content: center; margin-bottom: 1rem; font-size: 1.3rem;
+  }
+  .card h3 { font-size: 1rem; font-weight: 600; color: var(--navy);
+              margin-bottom: .5rem; }
+  .card p { font-size: .9rem; color: #666; line-height: 1.6; }
+
+  /* POPIA TABLE */
+  .popia-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  .popia-table th {
+    background: var(--navy); color: #fff; padding: .75rem 1rem;
+    text-align: left; font-size: .85rem; font-weight: 600;
+  }
+  .popia-table td {
+    padding: .7rem 1rem; font-size: .88rem; border-bottom: 1px solid #EEF1F5;
+  }
+  .popia-table tr:nth-child(even) td { background: #F8FAFB; }
+  .check { color: var(--sa-green); font-weight: 700; }
+
+  /* CODE BLOCK */
+  .code-demo {
+    background: #0F1F2E; border-radius: 10px; padding: 1.5rem;
+    margin-top: 1.5rem; overflow-x: auto;
+  }
+  .code-demo pre { font-family: 'Courier New', monospace; font-size: .85rem;
+                   color: #7DD3C0; line-height: 1.6; white-space: pre-wrap; }
+  .code-comment { color: #4A6B7A; }
+
+  /* PRICING */
+  .pricing-grid { display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                  gap: 1.2rem; margin-top: 2rem; }
+  .pricing-card {
+    border: 1.5px solid #E5EAF0; border-radius: 10px;
+    padding: 1.8rem 1.5rem; position: relative;
+  }
+  .pricing-card.featured {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(27,122,110,.08);
+  }
+  .tier-badge {
+    display: inline-block; font-size: .75rem; font-weight: 600;
+    padding: .25rem .8rem; border-radius: 20px;
+    background: var(--teal-light); color: var(--teal); margin-bottom: .75rem;
+  }
+  .pricing-card h3 { font-size: 1.1rem; font-weight: 700; color: var(--navy);
+                      margin-bottom: .25rem; }
+  .price { font-size: 1.6rem; font-weight: 700; color: var(--teal);
+            margin: .75rem 0 .25rem; }
+  .price-note { font-size: .8rem; color: var(--silver); margin-bottom: 1rem; }
+  .pricing-card ul { list-style: none; }
+  .pricing-card li { font-size: .88rem; color: #555; padding: .3rem 0;
+                      border-bottom: 1px solid #F0F3F6; display: flex;
+                      align-items: flex-start; gap: .5rem; }
+  .pricing-card li:last-child { border-bottom: none; }
+  .pricing-card li::before { content: "✓"; color: var(--sa-green);
+                              font-weight: 700; flex-shrink: 0; }
+
+  /* CONTACT */
+  .contact-section {
+    background: var(--navy); color: #fff;
+    text-align: center; padding: 4rem 2rem;
+  }
+  .contact-section h2 { color: #fff; margin-bottom: 1rem; }
+  .contact-section p { color: var(--silver); max-width: 500px;
+                        margin: 0 auto 2rem; line-height: 1.7; }
+  .contact-grid {
+    display: flex; justify-content: center; gap: 2rem;
+    flex-wrap: wrap; margin-top: 2rem;
+  }
+  .contact-item { text-align: center; }
+  .contact-item .label { font-size: .75rem; color: var(--silver);
+                          text-transform: uppercase; letter-spacing: .08em;
+                          margin-bottom: .3rem; }
+  .contact-item .value { color: #fff; font-size: .95rem; }
+
+  /* FOOTER */
+  footer {
+    background: #060E18; color: var(--silver);
+    padding: 1.5rem 2rem; text-align: center; font-size: .85rem;
+    border-top: 1px solid #1a2d3f;
+  }
+  footer a { color: var(--teal); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 2rem; }
+    .metric { padding: 1rem 1.2rem; border-right: none;
+               border-bottom: 1px solid #1a2d3f; }
+    .metric:last-child { border-bottom: none; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">AEGIS <span>GULF</span></div>
+  <div class="nav-links">
+    <a href="#capabilities">Capabilities</a>
+    <a href="#popia">POPIA Mapping</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">South Africa · POPIA Compliance Infrastructure</div>
+  <h1>Compliance at the<br><span>Speed of Your Stack</span></h1>
+  <p>AES-256-GCM encrypted archival, SHA-256 audit chains, and automated
+     breach detection — engineered for South Africa's high-concurrency platforms.</p>
+  <div class="hero-cta">
+    <a href="#contact" class="btn-primary">Request a Technical Briefing</a>
+    <a href="https://github.com/YOURUSERNAME/aegis-gulf-kernel"
+       class="btn-secondary" target="_blank">View Source on GitHub</a>
+  </div>
+</div>
+
+<!-- METRICS -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-num">31K+</div>
+    <div class="metric-label">Encrypted ops/sec<br>(Python prototype)</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num">&lt;2.1%</div>
+    <div class="metric-label">CPU overhead<br>under peak load</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num">AES-256</div>
+    <div class="metric-label">GCM encryption<br>per log entry</div>
+  </div>
+  <div class="metric">
+    <div class="metric-num">R10M</div>
+    <div class="metric-label">Max POPIA fine<br>we help you avoid</div>
+  </div>
+</div>
+
+<!-- CAPABILITIES -->
+<section id="capabilities">
+  <div class="section-label">What we build</div>
+  <h2>Compliance infrastructure,<br>not compliance paperwork</h2>
+  <p class="lead">Aegis Gulf deploys as a sidecar alongside your existing Kubernetes pods.
+     No application rewrites. No performance impact. Just compliance.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔐</div>
+      <h3>Immutable Archival Vault</h3>
+      <p>AES-256-GCM encrypted, append-only log vault. Every entry SHA-256 HMAC chained
+         to the previous — mathematically tamper-evident. POPIA Section 19 compliant.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚨</div>
+      <h3>Breach Detection &amp; Notification</h3>
+      <p>Real-time anomaly detection with automated Information Regulator–format
+         breach reports. POPIA Section 22 — notification as soon as reasonably possible.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👤</div>
+      <h3>Data Subject Rights Portal</h3>
+      <p>Automated DSAR intake, 30-day deadline enforcement, erasure and portability
+         workflows. Sections 23–25 — data subject rights fully automated.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <h3>Consent Lifecycle Management</h3>
+      <p>Consent capture at point of collection, versioning, withdrawal propagation,
+         and cryptographically timestamped records. Section 18 and 11 compliant.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏗️</div>
+      <h3>Sidecar Deployment</h3>
+      <p>Runs as a Docker sidecar alongside your existing Kubernetes pods.
+         Under 50MB image. You don't rewrite anything — we plug in next to it.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🇿🇦</div>
+      <h3>South African by Design</h3>
+      <p>Built in Kimberley, Northern Cape. Framed around POPIA and the
+         Information Regulator — not adapted from a foreign framework.
+         Data stays in South Africa.</p>
+    </div>
+  </div>
+</section>
+
+<!-- POPIA -->
+<section id="popia" style="background:#F8FAFB; max-width:100%; padding:4rem 2rem;">
+  <div style="max-width:1100px; margin:0 auto;">
+    <div class="section-label">Compliance mapping</div>
+    <h2>Every POPIA obligation. Every control.</h2>
+    <p class="lead">The Information Regulator is watching. Here is exactly what
+       Aegis Gulf covers and the evidence we produce for every section.</p>
+
+    <table class="popia-table">
+      <thead>
+        <tr>
+          <th>POPIA Section</th>
+          <th>Obligation</th>
+          <th>Aegis Gulf Control</th>
+          <th>Covered</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Section 8</td><td>Accountability</td>
+            <td>Full audit chain — every event cryptographically logged</td>
+            <td class="check">✓</td></tr>
+        <tr><td>Section 11</td><td>Lawful processing — consent</td>
+            <td>Consent capture, versioning, and withdrawal engine</td>
+            <td class="check">✓</td></tr>
+        <tr><td>Section 14</td><td>Retention of records</td>
+            <td>5-year WORM immutable archival with auto-disposal</td>
+            <td class="check">✓</td></tr>
+        <tr><td>Section 18</td><td>Notification at collection</td>
+            <td>UI injection at every point of data collection</td>
+            <td class="check">✓</td></tr>
+        <tr><td>Section 19</td><td>Security safeguards</td>
+            <td>AES-256-GCM encryption, SHA-256 HMAC, TLS 1.3</td>
+            <td class="check">✓</td></tr>
+        <tr><td>Section 22</td><td>Breach notification</td>
+            <td>Real-time detection, automated Regulator-format report</td>
+            <td class="check">✓</td></tr>
+        <tr><td>Sections 23–25</td><td>Data subject rights</td>
+            <td>DSAR portal — access, correction, erasure, portability</td>
+            <td class="check">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- TECH DEMO -->
+<section>
+  <div class="section-label">Working prototype</div>
+  <h2>Real code. Real encryption. Real results.</h2>
+  <p class="lead">The Aegis Gulf kernel is not a whitepaper promise.
+     It is running code you can inspect, test, and benchmark right now.</p>
+
+  <div class="code-demo">
+    <pre><span class="code-comment"># Archive a POPIA-compliant log entry — AES-256-GCM encrypted</span>
+curl -X POST https://aegis-kernel.onrender.com/archive \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_type": "user_consent_captured",
+    "payload": {
+      "user_id": "ZA-082-9912",
+      "consent_scope": ["marketing", "analytics"]
+    },
+    "metadata": {"popia_section": "S.18"}
+  }'
+
+<span class="code-comment"># Response — entry encrypted, chained, archived</span>
+{
+  "status":        "archived",
+  "entry_id":      1,
+  "encrypted":     true,
+  "algorithm":     "AES-256-GCM",
+  "latency_us":    38.7,
+  "chain_hmac":    "713703952cad45a5...",
+  "popia_section": "S.19 — Security safeguards — COMPLIANT"
+}</pre>
+  </div>
+  <p style="margin-top:1rem; font-size:.9rem; color:#666;">
+    Run the full demo locally:
+    <code style="background:#F0F4F8; padding:.2rem .6rem; border-radius:4px; font-size:.85rem;">
+      git clone https://github.com/YOURUSERNAME/aegis-gulf-kernel &amp;&amp; python3 demo.py
+    </code>
+  </p>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="background:#F8FAFB; max-width:100%; padding:4rem 2rem;">
+  <div style="max-width:1100px; margin:0 auto;">
+    <div class="section-label">Investment</div>
+    <h2>Start with a 30-day Ignition Phase.<br>No long-term risk.</h2>
+    <p class="lead">Your engineering team verifies our performance benchmarks in your
+       environment before any long-term agreement is discussed.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <span class="tier-badge">Ignition PoC</span>
+        <h3>Proof of Concept</h3>
+        <div class="price">R45,000</div>
+        <div class="price-note">Once-off · 30 days · staging environment</div>
+        <ul>
+          <li>Single-node sidecar in your staging environment</li>
+          <li>Signed Performance Benchmark Report</li>
+          <li>No long-term commitment required</li>
+          <li>Your team verifies the numbers</li>
+        </ul>
+      </div>
+      <div class="pricing-card">
+        <span class="tier-badge">Shield</span>
+        <h3>Mid-Market</h3>
+        <div class="price">R12,500<span style="font-size:1rem;font-weight:400">/mo</span></div>
+        <div class="price-note">Billed annually · up to 1M transactions/month</div>
+        <ul>
+          <li>Full C++ archival core</li>
+          <li>POPIA Section 19 reporting</li>
+          <li>99.9% uptime SLA</li>
+          <li>Data subject rights portal</li>
+        </ul>
+      </div>
+      <div class="pricing-card featured">
+        <span class="tier-badge">Sentinel</span>
+        <h3>Enterprise</h3>
+        <div class="price">R45K–85K<span style="font-size:1rem;font-weight:400">/mo</span></div>
+        <div class="price-note">Volume tiered · unlimited concurrency</div>
+        <ul>
+          <li>Hardware acceleration (AES-NI)</li>
+          <li>Multi-cloud redundancy</li>
+          <li>24/7 priority support</li>
+          <li>Custom legacy integration</li>
+        </ul>
+      </div>
+      <div class="pricing-card">
+        <span class="tier-badge">Architect</span>
+        <h3>Consultancy</h3>
+        <div class="price">R1,850<span style="font-size:1rem;font-weight:400">/hr</span></div>
+        <div class="price-note">Custom C++ hooks · legacy systems</div>
+        <ul>
+          <li>Custom integration architecture</li>
+          <li>Legacy system compliance hooks</li>
+          <li>Staff training sessions</li>
+          <li>Regulator submission support</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div class="contact-section" id="contact">
+  <h2>Request a Technical Briefing</h2>
+  <p>30 minutes with your Lead Architect and Information Officer.
+     We walk through a live benchmark against your data load.
+     No commitment required.</p>
+  <a href="mailto:YOUREMAIL@sol.ac.za" class="btn-primary">
+    Book a Briefing
+  </a>
+  <div class="contact-grid">
+    <div class="contact-item">
+      <div class="label">Name</div>
+      <div class="value">Nvula Bontes</div>
+    </div>
+    <div class="contact-item">
+      <div class="label">Title</div>
+      <div class="value">Lead Architect</div>
+    </div>
+    <div class="contact-item">
+      <div class="label">Location</div>
+      <div class="value">Kimberley, Northern Cape</div>
+    </div>
+    <div class="contact-item">
+      <div class="label">GitHub</div>
+      <div class="value">
+        <a href="https://github.com/YOURUSERNAME/aegis-gulf-kernel"
+           style="color:var(--teal)">aegis-gulf-kernel</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Aegis Gulf · Kimberley, Northern Cape, South Africa ·
+     <a href="https://github.com/YOURUSERNAME/aegis-gulf-kernel">GitHub</a> ·
+     Securing the Future</p>
+</footer>
+
+</body>
+</html>
